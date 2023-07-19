@@ -25,9 +25,9 @@ class ThreadResource extends JsonResource
             'first_post_id' => $this->first_post_id,
             'last_post_id' => $this->last_post_id,
             'reply_count' => $this->reply_count,
-            'created_at' => $this->created_at->toDateTimeString(),
-            'updated_at' => $this->updated_at->toDateTimeString(),
-            'deleted_at' => $this->deleted_at ? $this->deleted_at->toDateTimeString() : null,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'deleted_at' => $this->deleted_at,
             'actions' => [
                 'post:lock' => ForumApi::route('thread.lock', ['thread' => $this->id]),
                 'post:unlock' => ForumApi::route('thread.unlock', ['thread' => $this->id]),
