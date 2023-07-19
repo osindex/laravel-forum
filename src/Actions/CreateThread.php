@@ -13,13 +13,15 @@ class CreateThread extends BaseAction
     private Model $author;
     private string $title;
     private string $content;
+    private Array $images;
 
-    public function __construct(Category $category, Model $author, string $title, string $content)
+    public function __construct(Category $category, Model $author, string $title, string $content, Array $images)
     {
         $this->category = $category;
         $this->author = $author;
         $this->title = $title;
         $this->content = $content;
+        $this->images = $images;
     }
 
     protected function transact()
@@ -28,6 +30,7 @@ class CreateThread extends BaseAction
             'author_id' => $this->author->getKey(),
             'category_id' => $this->category->id,
             'title' => $this->title,
+            'images' => $this->images,
         ]);
 
         $post = $thread->posts()->create([

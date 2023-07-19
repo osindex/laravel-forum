@@ -27,8 +27,8 @@ class CategoryResource extends JsonResource
             'right' => $this->_rgt,
             'parent_id' => $this->parent_id,
             'color' => $this->color,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at->toDateTimeString(),
+            'updated_at' => $this->updated_at->toDateTimeString(),
             'actions' => [
                 'patch:update' => ForumApi::route('category.update', ['category' => $this->id]),
                 'delete:delete' => ForumApi::route('category.delete', ['category' => $this->id]),

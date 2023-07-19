@@ -19,8 +19,9 @@ class CreateThread extends FormRequest implements FulfillableRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'min:'.config('forum.general.validation.title_min')],
-            'content' => ['required', 'string', 'min:'.config('forum.general.validation.content_min')],
+            'title' => ['required', 'string', 'min:' . config('forum.general.validation.title_min')],
+            'content' => ['required', 'string', 'min:' . config('forum.general.validation.content_min')],
+            'images' => config('forum.general.validation.images') ?? [],
         ];
     }
 
@@ -29,7 +30,7 @@ class CreateThread extends FormRequest implements FulfillableRequest
         $input = $this->validated();
         $category = $this->route('category');
 
-        $action = new Action($category, $this->user(), $input['title'], $input['content']);
+        $action = new Action($category, $this->user(), $input['title'], $input['content'], $input['images']);
         $thread = $action->execute();
 
         UserCreatedThread::dispatch($this->user(), $thread);

@@ -21,9 +21,9 @@ class PostResource extends JsonResource
             'content' => $this->content,
             'post_id' => $this->post_id,
             'sequence' => $this->sequence,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'deleted_at' => $this->deleted_at,
+            'created_at' => $this->created_at->toDateTimeString(),
+            'updated_at' => $this->updated_at->toDateTimeString(),
+            'deleted_at' => $this->deleted_at ? $this->deleted_at->toDateTimeString() : null,
             'actions' => [
                 'patch:update' => ForumApi::route('post.update', ['post' => $this->id]),
                 'delete:delete' => ForumApi::route('post.delete', ['post' => $this->id]),

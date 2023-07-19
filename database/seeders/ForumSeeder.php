@@ -19,11 +19,12 @@ class ForumSeeder extends Seeder
     public function run()
     {
         $userModel = config('forum.integration.user_model');
-        $userId = DB::table((new $userModel)->getTable())->insertGetId([
+        $userId = optional(DB::table((new $userModel)->getTable())->first())->id ?? DB::table((new $userModel)->getTable())->insertGetId([
             'name' => Str::random(10),
-            'email' => Str::random(10).'@gmail.com',
+            'email' => Str::random(10) . '@gmail.com',
             'password' => Hash::make('secret'),
         ]);
+
 
         $firstCategory = $this->createPopulatedCategory($userId);
         $secondCategory = CategoryFactory::new()->createOne();

@@ -28,9 +28,13 @@ class Thread extends BaseModel
         'first_post_id',
         'last_post_id',
         'updated_at',
+        'images',
     ];
 
     public const READERS_TABLE = 'forum_threads_read';
+    protected $casts = [
+        'images' => 'array',
+    ];
 
     public const STATUS_UNREAD = 'unread';
     public const STATUS_UPDATED = 'updated';
