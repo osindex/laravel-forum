@@ -30,7 +30,7 @@ class CreateThread extends FormRequest implements FulfillableRequest
         $input = $this->validated();
         $category = $this->route('category');
 
-        $action = new Action($category, $this->user(), $input['title'], $input['content'], $input['images']);
+        $action = new Action($category, $this->user(), $input['title'], $input['content'], $input['images'] ?? []);
         $thread = $action->execute();
 
         UserCreatedThread::dispatch($this->user(), $thread);
