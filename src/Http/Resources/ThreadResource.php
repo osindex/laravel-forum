@@ -48,14 +48,15 @@ class ThreadResource extends JsonResource
      */
     public function with($request)
     {
-        return [
+        $links =  [
             'links' => [
                 'self' => ForumApi::route('thread.fetch', ['thread' => $this->id]),
                 'category' => ForumApi::route('category.fetch', ['category' => $this->category_id]),
                 'posts' => ForumApi::route('thread.posts', ['thread' => $this->id]),
-                'first_post_id' => ForumApi::route('post.fetch', ['post' => $this->first_post_id]),
-                'last_post_id' => ForumApi::route('post.fetch', ['post' => $this->last_post_id]),
             ],
         ];
+        $this->first_post_id && $links['links']['link']['first_post_id'] = ForumApi::route('post.fetch', ['post' => $this->first_post_id]);
+        $this->last_post_id && $links['links']['link']['last_post_id'] = ForumApi::route('post.fetch', ['post' => $this->last_post_id]);
+        return $links;
     }
 }
