@@ -39,8 +39,8 @@ class Thread extends BaseModel
     public const STATUS_UNREAD = 'unread';
     public const STATUS_UPDATED = 'updated';
 
-    public const STATUS_SHOW = 'show';
-    public const STATUS_STASH = 'stash';
+    public const STATUS_SHOW = 1;
+    public const STATUS_STASH = 0;
 
     private $currentReader = null;
 
@@ -67,7 +67,7 @@ class Thread extends BaseModel
 
     public function posts(): HasMany
     {
-        return $this->hasMany(Post::class)->show();
+        return $this->hasMany(Post::class, 'id', 'thread_id');
     }
 
     public function firstPost(): HasOne

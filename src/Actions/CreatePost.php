@@ -31,16 +31,20 @@ class CreatePost extends BaseAction
     protected function transact()
     {
         $post = $this->thread->posts()->create([
+            'thread_id' => $this->thread->id, // why 
             'post_id' => $this->parent === null ? null : $this->parent->id,
             'author_id' => $this->author->getKey(),
             'sequence' => $this->thread->posts->count() + 1,
             'content' => $this->content,
         ]);
-
-        $this->thread->update([
+        $update = [
             'last_post_id' => $post->id,
             'reply_count' => DB::raw('reply_count + 1'),
-        ]);
+        ];
+        if (!$this->thread->first_post_id) {
+            $update['first_post_id'] = $post->id;
+        }
+        $this->thread->update($update);
 
         $this->thread->category->updateWithoutTouch([
             'latest_active_thread_id' => $this->thread->id,
