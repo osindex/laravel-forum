@@ -19,6 +19,7 @@ class ThreadResource extends JsonResource
             'author_id' => $this->author_id,
             'author_name' => $this->author_name,
             'title' => $this->title,
+            'content' => $this->content,
             'images' => $this->images,
             'pinned' => $this->pinned == 1,
             'locked' => $this->locked == 1,

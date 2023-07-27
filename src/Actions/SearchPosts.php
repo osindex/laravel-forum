@@ -21,7 +21,8 @@ class SearchPosts extends BaseAction
 
     protected function transact()
     {
-        $posts = $this->postModel::orderBy('created_at', 'DESC')
+        $posts = $this->postModel::sortBy(request()->get('sort', '-id'))
+            ->status(request()->get('status', '-1'))
             ->with('thread', 'thread.category')
             ->when($this->category, function (Builder $query) {
                 $query->whereHas('thread.category', function (Builder $query) {

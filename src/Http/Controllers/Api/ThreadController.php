@@ -33,12 +33,12 @@ class ThreadController extends BaseController
     public function recent(Request $request, bool $unreadOnly = false): AnonymousResourceCollection
     {
         $threads = $this->model::recent()
+            ->sortBy($request->get('sort', '-id'))->status($request->get('status', '-1'))
             ->get()
             ->filter(function ($thread) use ($request, $unreadOnly) {
                 return $thread->category->isAccessibleTo($request->user())
-                    && (! $unreadOnly || $thread->userReadStatus !== null)
-                    && (
-                        ! $thread->category->is_private
+                    && (!$unreadOnly || $thread->userReadStatus !== null)
+                    && (!$thread->category->is_private
                         || $request->user()
                         && $request->user()->can('view', $thread)
                     );
@@ -62,11 +62,11 @@ class ThreadController extends BaseController
     public function indexByCategory(Request $request): AnonymousResourceCollection|Response
     {
         $category = $request->route('category');
-        if (! $category->isAccessibleTo($request->user())) {
+        if (!$category->isAccessibleTo($request->user())) {
             return $this->notFoundResponse();
         }
 
-        $query = $this->model::orderBy('created_at')->where('category_id', $category->id);
+        $query = $this->model::where('category_id', $category->id)->sortBy($request->get('sort', '-id'))->status($request->get('status', '-1'));
 
         $createdAfter = $request->query('created_after');
         $createdBefore = $request->query('created_before');
@@ -107,7 +107,7 @@ class ThreadController extends BaseController
     public function fetch(Request $request): JsonResource|Response
     {
         $thread = $request->route('thread');
-        if (! $thread->category->isAccessibleTo($request->user())) {
+        if (!$thread->category->isAccessibleTo($request->user())) {
             return $this->notFoundResponse();
         }
 

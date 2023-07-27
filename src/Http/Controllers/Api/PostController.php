@@ -35,7 +35,7 @@ class PostController extends BaseController
             $this->authorize('view', $thread);
         }
 
-        return $this->resourceClass::collection($thread->posts()->paginate());
+        return $this->resourceClass::collection($thread->posts()->sortBy($request->get('sort', '-id'))->status($request->get('status', '-1'))->paginate());
     }
 
     public function search(SearchPosts $request): AnonymousResourceCollection
@@ -48,6 +48,7 @@ class PostController extends BaseController
     public function recent(Request $request, bool $unreadOnly = false): AnonymousResourceCollection
     {
         $posts = $this->model::recent()
+            ->sortBy($request->get('sort', '-id'))->status($request->get('status', '-1'))
             ->get()
             ->filter(function (Model $post) use ($request, $unreadOnly) {
                 return $post->thread->category->isAccessibleTo($request->user())

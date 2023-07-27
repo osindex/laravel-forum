@@ -75,4 +75,8 @@ return [
         'content_min' => 3,
     ],
 
+
+    'func' => [
+        'postWhenThread' => true
+    ]
 ];

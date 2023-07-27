@@ -37,24 +37,25 @@ class CreateThread extends BaseAction
             'category_id' => $this->category->id,
             'title' => $this->title,
             'images' => $this->images,
+            'content' => $this->content
         ]);
-
-        $post = $thread->posts()->create([
-            'author_id' => $this->author->getKey(),
-            'content' => $this->content,
-            'sequence' => 1,
-        ]);
-
-        $thread->update([
-            'first_post_id' => $post->id,
-            'last_post_id' => $post->id,
-        ]);
+        if (config('forum.general.func.postWhenThread', true)) {
+            $post = $thread->posts()->create([
+                'author_id' => $this->author->getKey(),
+                'content' => $this->content,
+                'sequence' => 1,
+            ]);
+            $thread->update([
+                'first_post_id' => $post->id,
+                'last_post_id' => $post->id,
+            ]);
+        }
 
         $thread->category->updateWithoutTouch([
             'newest_thread_id' => $thread->id,
             'latest_active_thread_id' => $thread->id,
             'thread_count' => DB::raw('thread_count + 1'),
-            'post_count' => DB::raw('post_count + 1'),
+            'post_count' => config('forum.general.func.postWhenThread', true) ? DB::raw('post_count + 1') : 0,
         ]);
 
         return $thread;
