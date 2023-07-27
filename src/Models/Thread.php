@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
+use TeamTeaTime\Forum\Factories\PostFactory;
 use TeamTeaTime\Forum\Models\Traits\HasAuthor;
 
 class Thread extends BaseModel
@@ -52,7 +54,7 @@ class Thread extends BaseModel
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(CategoryFactory::model());
     }
 
     public function readers(): BelongsToMany
@@ -67,17 +69,17 @@ class Thread extends BaseModel
 
     public function posts(): HasMany
     {
-        return $this->hasMany(Post::class, 'thread_id');
+        return $this->hasMany(PostFactory::model(), 'thread_id');
     }
 
     public function firstPost(): HasOne
     {
-        return $this->hasOne(Post::class, 'id', 'first_post_id')->show();
+        return $this->hasOne(PostFactory::model(), 'id', 'first_post_id')->show();
     }
 
     public function lastPost(): HasOne
     {
-        return $this->hasOne(Post::class, 'id', 'last_post_id')->show();
+        return $this->hasOne(PostFactory::model(), 'id', 'last_post_id')->show();
     }
 
     public function scopeShow(Builder $query): Builder
@@ -131,7 +133,7 @@ class Thread extends BaseModel
         return $this->reply_count + 1;
     }
 
-    public function getLastPost(): Post
+    public function getLastPost()
     {
         return $this->posts()->orderBy('created_at', 'desc')->first();
     }

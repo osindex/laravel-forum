@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use TeamTeaTime\Forum\Factories\PostFactory;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
 use TeamTeaTime\Forum\Models\Traits\HasAuthor;
 
 class Post extends BaseModel
@@ -31,22 +33,22 @@ class Post extends BaseModel
 
     public function thread(): BelongsTo
     {
-        return $this->belongsTo(Thread::class)->withTrashed();
+        return $this->belongsTo(ThreadFactory::model())->withTrashed();
     }
 
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(Post::class, 'post_id');
+        return $this->belongsTo(PostFactory::model(), 'post_id');
     }
 
     public function children(): HasMany
     {
-        return $this->hasMany(Post::class, 'post_id')->withTrashed();
+        return $this->hasMany(PostFactory::model(), 'post_id')->withTrashed();
     }
 
     public function scopeShow(Builder $query): Builder
     {
-        return $query->where('status', Thread::STATUS_SHOW);
+        return $query->where('status', ThreadFactory::model()::STATUS_SHOW);
     }
 
     public function scopeRecent(Builder $query): Builder

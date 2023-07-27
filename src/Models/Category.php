@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User;
 use Kalnoy\Nestedset\NodeTrait;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
 use TeamTeaTime\Forum\Support\CategoryPrivacy;
 use TeamTeaTime\Forum\Support\Web\Forum;
 
@@ -30,17 +31,17 @@ class Category extends BaseModel
 
     public function threads(): HasMany
     {
-        return $this->hasMany(Thread::class);
+        return $this->hasMany(ThreadFactory::model());
     }
 
     public function newestThread(): HasOne
     {
-        return $this->hasOne(Thread::class, 'id', 'newest_thread_id');
+        return $this->hasOne(ThreadFactory::model(), 'id', 'newest_thread_id');
     }
 
     public function latestActiveThread(): HasOne
     {
-        return $this->hasOne(Thread::class, 'id', 'latest_active_thread_id');
+        return $this->hasOne(ThreadFactory::model(), 'id', 'latest_active_thread_id');
     }
 
     public function scopeTopLevel(Builder $query): Builder
