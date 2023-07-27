@@ -2,16 +2,16 @@
 
 namespace TeamTeaTime\Forum\Events\Types;
 
-use TeamTeaTime\Forum\Models\Category;
+use Illuminate\Database\Eloquent\Model;
 
 class CategoryEvent extends BaseEvent
 {
     /** @var mixed */
     public $user;
 
-    public Category $category;
+    public Model $category;
 
-    public function __construct($user, Category $category)
+    public function __construct($user, Model $category)
     {
         $this->user = $user;
         $this->category = $category;

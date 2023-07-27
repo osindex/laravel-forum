@@ -2,15 +2,14 @@
 
 namespace TeamTeaTime\Forum\Actions;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use TeamTeaTime\Forum\Models\Post;
 
 class DeletePost extends BaseAction
 {
-    private Post $post;
+    private Model $post;
     private bool $permaDelete;
-
-    public function __construct(Post $post, bool $permaDelete = false)
+    public function __construct(Model $post, bool $permaDelete = false)
     {
         $this->post = $post;
         $this->permaDelete = $permaDelete;

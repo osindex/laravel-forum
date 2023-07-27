@@ -2,18 +2,18 @@
 
 namespace TeamTeaTime\Forum\Actions;
 
-use TeamTeaTime\Forum\Models\Category;
+use Illuminate\Database\Eloquent\Model;
 
 class UpdateCategory extends BaseAction
 {
-    private Category $category;
+    private Model $category;
     private ?string $title;
     private ?string $description;
     private ?string $color;
     private ?bool $acceptsThreads;
     private ?bool $isPrivate;
 
-    public function __construct(Category $category, ?string $title, ?string $description, ?string $color, ?bool $acceptsThreads, ?bool $isPrivate)
+    public function __construct(Model $category, ?string $title, ?string $description, ?string $color, ?bool $acceptsThreads, ?bool $isPrivate)
     {
         $this->category = $category;
         $this->title = $title;

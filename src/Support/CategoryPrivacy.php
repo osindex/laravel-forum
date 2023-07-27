@@ -4,7 +4,7 @@ namespace TeamTeaTime\Forum\Support;
 
 use Illuminate\Foundation\Auth\User;
 use Kalnoy\Nestedset\Collection as NestedCollection;
-use TeamTeaTime\Forum\Models\Category;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
 
 class CategoryPrivacy
 {
@@ -56,7 +56,8 @@ class CategoryPrivacy
     private static function getQuery(array $select = self::DEFAULT_SELECT, array $with = self::DEFAULT_WITH)
     {
         // 'is_private' and 'parent_id' fields are required for filtering
-        return Category::select(array_merge($select, ['is_private', 'parent_id']))
+        
+        return CategoryFactory::model()::select(array_merge($select, ['is_private', 'parent_id']))
             ->with($with)
             ->defaultOrder();
     }

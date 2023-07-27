@@ -2,19 +2,24 @@
 
 namespace TeamTeaTime\Forum\Actions\Bulk;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use TeamTeaTime\Forum\Actions\BaseAction;
-use TeamTeaTime\Forum\Models\Category;
-use TeamTeaTime\Forum\Models\Thread;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
 
 class MoveThreads extends BaseAction
 {
     private array $threadIds;
-    private Category $destinationCategory;
+    private Model $destinationCategory;
     private bool $includeTrashed;
+    protected $categoryModel = null;
+    protected $threadModel = null;
 
-    public function __construct(array $threadIds, Category $destinationCategory, bool $includeTrashed)
+    public function __construct(array $threadIds, Model $destinationCategory, bool $includeTrashed)
     {
+        $this->categoryModel = CategoryFactory::model();
+        $this->threadModel = ThreadFactory::model();
         $this->threadIds = $threadIds;
         $this->destinationCategory = $destinationCategory;
         $this->includeTrashed = $includeTrashed;
@@ -23,7 +28,7 @@ class MoveThreads extends BaseAction
     protected function transact()
     {
         // Don't include threads that are already in the destination category
-        $query = DB::table(Thread::getTableName())->where('category_id', '!=', $this->destinationCategory->id)->whereIn('id', $this->threadIds);
+        $query = DB::table($this->threadModel::getTableName())->where('category_id', '!=', $this->destinationCategory->id)->whereIn('id', $this->threadIds);
 
         $threads = $this->includeTrashed
             ? $query->get()
@@ -35,7 +40,7 @@ class MoveThreads extends BaseAction
         }
 
         $threadsByCategory = $threads->groupBy('category_id');
-        $sourceCategories = Category::whereIn('id', $threads->pluck('category_id'))->get();
+        $sourceCategories = $this->categoryModel::whereIn('id', $threads->pluck('category_id'))->get();
         $destinationCategory = $this->destinationCategory;
 
         $query->update(['category_id' => $destinationCategory->id]);

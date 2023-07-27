@@ -20,6 +20,7 @@ abstract class BaseAction
             return $result;
         } catch (Exception $e) {
             DB::rollBack();
+            // dd($e->getMessage());
             throw new Exception('An exception occurred during an Action transaction.', 0, $e);
         }
     }

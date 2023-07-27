@@ -4,20 +4,22 @@ namespace TeamTeaTime\Forum\Actions\Bulk;
 
 use Illuminate\Support\Facades\DB;
 use TeamTeaTime\Forum\Actions\BaseAction;
-use TeamTeaTime\Forum\Models\Post;
+use TeamTeaTime\Forum\Factories\PostFactory;
 
 class RestorePosts extends BaseAction
 {
     private array $postIds;
+    protected $postModel = null;
 
     public function __construct(array $postIds)
     {
+        $this->postModel = PostFactory::model();
         $this->postIds = $postIds;
     }
 
     protected function transact()
     {
-        $posts = Post::whereIn('id', $this->postIds)->onlyTrashed()->get();
+        $posts = $this->postModel::whereIn('id', $this->postIds)->onlyTrashed()->get();
 
         // Return early if there are no eligible threads in the selection
         if ($posts->count() == 0) {
@@ -25,10 +27,10 @@ class RestorePosts extends BaseAction
         }
 
         // Use the raw query builder to prevent touching updated_at
-        $rowsAffected = DB::table(Post::getTableName())
+        $rowsAffected = DB::table($this->postModel::getTableName())
             ->whereIn('id', $this->postIds)
-            ->whereNotNull(Post::DELETED_AT)
-            ->update([Post::DELETED_AT => null]);
+            ->whereNotNull($this->postModel::DELETED_AT)
+            ->update([$this->postModel::DELETED_AT => null]);
 
         if ($rowsAffected == 0) {
             return null;

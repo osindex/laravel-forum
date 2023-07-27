@@ -4,27 +4,29 @@ namespace TeamTeaTime\Forum\Actions\Bulk;
 
 use Illuminate\Support\Facades\DB;
 use TeamTeaTime\Forum\Actions\BaseAction;
-use TeamTeaTime\Forum\Models\Thread;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
 
 class UnlockThreads extends BaseAction
 {
     private array $threadIds;
     private bool $includeTrashed;
+    protected $threadModel = null;
 
     public function __construct(array $threadIds, bool $includeTrashed)
     {
+        $this->threadModel = ThreadFactory::model();
         $this->threadIds = $threadIds;
         $this->includeTrashed = $includeTrashed;
     }
 
     protected function transact()
     {
-        $query = DB::table(Thread::getTableName())
+        $query = DB::table($this->threadModel::getTableName())
             ->whereIn('id', $this->threadIds)
             ->where(['locked' => true]);
 
-        if (! $this->includeTrashed) {
-            $query = $query->whereNull(Thread::DELETED_AT);
+        if (!$this->includeTrashed) {
+            $query = $query->whereNull($this->threadModel::DELETED_AT);
         }
 
         $threads = $query->get();

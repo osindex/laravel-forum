@@ -2,14 +2,14 @@
 
 namespace TeamTeaTime\Forum\Actions;
 
-use TeamTeaTime\Forum\Models\Post;
+use Illuminate\Database\Eloquent\Model;
 
 class UpdatePost extends BaseAction
 {
-    private Post $post;
+    private Model $post;
     private string $content;
 
-    public function __construct(Post $post, string $content)
+    public function __construct(Model $post, string $content)
     {
         $this->post = $post;
         $this->content = $content;

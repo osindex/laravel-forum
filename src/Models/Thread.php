@@ -39,6 +39,9 @@ class Thread extends BaseModel
     public const STATUS_UNREAD = 'unread';
     public const STATUS_UPDATED = 'updated';
 
+    public const STATUS_SHOW = 'show';
+    public const STATUS_STASH = 'stash';
+
     private $currentReader = null;
 
     public function __construct(array $attributes = [])
@@ -64,17 +67,21 @@ class Thread extends BaseModel
 
     public function posts(): HasMany
     {
-        return $this->hasMany(Post::class);
+        return $this->hasMany(Post::class)->show();
     }
 
     public function firstPost(): HasOne
     {
-        return $this->hasOne(Post::class, 'id', 'first_post_id');
+        return $this->hasOne(Post::class, 'id', 'first_post_id')->show();
     }
 
     public function lastPost(): HasOne
     {
-        return $this->hasOne(Post::class, 'id', 'last_post_id');
+        return $this->hasOne(Post::class, 'id', 'last_post_id')->show();
+    }
+    public function scopeShow(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_SHOW);
     }
 
     public function scopeRecent(Builder $query): Builder
@@ -82,19 +89,19 @@ class Thread extends BaseModel
         $age = strtotime(config('forum.general.old_thread_threshold'), 0);
         $cutoff = time() - $age;
 
-        return $query->where('updated_at', '>', date('Y-m-d H:i:s', $cutoff))->orderBy('updated_at', 'desc');
+        return $query->where('updated_at', '>', date('Y-m-d H:i:s', $cutoff))->orderBy('updated_at', 'desc')->show();
     }
 
     public function getIsOldAttribute(): bool
     {
         $age = config('forum.general.old_thread_threshold');
 
-        return ! $age || $this->updated_at->timestamp < (time() - strtotime($age, 0));
+        return !$age || $this->updated_at->timestamp < (time() - strtotime($age, 0));
     }
 
     public function getReaderAttribute()
     {
-        if (! Auth::check()) {
+        if (!Auth::check()) {
             return null;
         }
 
@@ -107,15 +114,15 @@ class Thread extends BaseModel
 
     public function getUserReadStatusAttribute(): ?string
     {
-        if ($this->isOld || ! Auth::check()) {
+        if ($this->isOld || !Auth::check()) {
             return null;
         }
 
         if ($this->reader === null) {
-            return trans('forum::general.'.self::STATUS_UNREAD);
+            return trans('forum::general.' . self::STATUS_UNREAD);
         }
 
-        return $this->updatedSince($this->reader) ? trans('forum::general.'.self::STATUS_UPDATED) : null;
+        return $this->updatedSince($this->reader) ? trans('forum::general.' . self::STATUS_UPDATED) : null;
     }
 
     public function getPostCountAttribute(): int

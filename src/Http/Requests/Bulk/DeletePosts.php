@@ -5,10 +5,10 @@ namespace TeamTeaTime\Forum\Http\Requests\Bulk;
 use Illuminate\Foundation\Http\FormRequest;
 use TeamTeaTime\Forum\Actions\Bulk\DeletePosts as Action;
 use TeamTeaTime\Forum\Events\UserBulkDeletedPosts;
+use TeamTeaTime\Forum\Factories\PostFactory;
 use TeamTeaTime\Forum\Http\Requests\Traits\AuthorizesAfterValidation;
 use TeamTeaTime\Forum\Http\Requests\Traits\HandlesDeletion;
 use TeamTeaTime\Forum\Interfaces\FulfillableRequest;
-use TeamTeaTime\Forum\Models\Post;
 use TeamTeaTime\Forum\Support\CategoryPrivacy;
 
 class DeletePosts extends FormRequest implements FulfillableRequest
@@ -25,7 +25,7 @@ class DeletePosts extends FormRequest implements FulfillableRequest
 
     public function authorizeValidated(): bool
     {
-        $query = Post::query();
+        $query = PostFactory::model()::query();
 
         if ($this->user()->can('viewTrashedPosts')) {
             $query = $query->withTrashed();

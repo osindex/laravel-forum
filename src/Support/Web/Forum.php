@@ -4,9 +4,10 @@ namespace TeamTeaTime\Forum\Support\Web;
 
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
-use TeamTeaTime\Forum\Models\Category;
-use TeamTeaTime\Forum\Models\Post;
-use TeamTeaTime\Forum\Models\Thread;
+
+use TeamTeaTime\Forum\Factories\CategoryFactory;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
+use TeamTeaTime\Forum\Factories\PostFactory;
 
 class Forum
 {
@@ -30,7 +31,11 @@ class Forum
     {
         $as = config('forum.web.router.as');
 
-        if (! Str::startsWith($route, $as)) {
+        $categoryModel = CategoryFactory::model();
+        $threadModel = ThreadFactory::model();
+        $postModel = PostFactory::model();
+
+        if (!Str::startsWith($route, $as)) {
             $route = "{$as}{$route}";
         }
 
@@ -38,21 +43,21 @@ class Forum
             return route($route);
         }
 
-        if ($model instanceof Category) {
+        if ($model instanceof $categoryModel) {
             return route($route, [
                 'category' => $model->id,
                 'category_slug' => static::slugify($model->title, 'category'),
             ]);
         }
 
-        if ($model instanceof Thread) {
+        if ($model instanceof $threadModel) {
             return route($route, [
                 'thread' => $model->id,
                 'thread_slug' => static::slugify($model->title),
             ]);
         }
 
-        if ($model instanceof Post) {
+        if ($model instanceof $postModel) {
             $params = [
                 'thread' => $model->thread->id,
                 'thread_slug' => static::slugify($model->thread->title),
@@ -69,7 +74,7 @@ class Forum
                 $params['post'] = $model->id;
             }
 
-            return route($route, $params).$append;
+            return route($route, $params) . $append;
         }
 
         throw \Exception('Invalid model type passed to Forum::route().');

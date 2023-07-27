@@ -6,9 +6,9 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use TeamTeaTime\Forum\Models\Category;
-use TeamTeaTime\Forum\Models\Post;
-use TeamTeaTime\Forum\Models\Thread;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
+use TeamTeaTime\Forum\Factories\PostFactory;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
 
 class ResolveWebParameters
 {
@@ -25,7 +25,7 @@ class ResolveWebParameters
         $parameters = $request->route()->parameters();
 
         if (array_key_exists('category', $parameters)) {
-            $category = Category::find($parameters['category']);
+            $category = CategoryFactory::model()::find($parameters['category']);
 
             if ($category === null) {
                 throw new NotFoundHttpException("Failed to resolve 'category' route parameter.");
@@ -35,7 +35,7 @@ class ResolveWebParameters
         }
 
         if (array_key_exists('thread', $parameters)) {
-            $query = Thread::with('category');
+            $query = ThreadFactory::model()::with('category');
 
             if (Gate::allows('viewTrashedThreads')) {
                 $query->withTrashed();
@@ -51,7 +51,7 @@ class ResolveWebParameters
         }
 
         if (array_key_exists('post', $parameters)) {
-            $query = Post::with(['thread', 'thread.category']);
+            $query = PostFactory::model()::with(['thread', 'thread.category']);
 
             if (Gate::allows('viewTrashedPosts')) {
                 $query->withTrashed();

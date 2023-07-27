@@ -2,18 +2,19 @@
 
 namespace TeamTeaTime\Forum\Http\Requests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use TeamTeaTime\Forum\Actions\SearchPosts as Action;
 use TeamTeaTime\Forum\Events\UserSearchedPosts;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
 use TeamTeaTime\Forum\Http\Requests\Traits\AuthorizesAfterValidation;
 use TeamTeaTime\Forum\Interfaces\FulfillableRequest;
-use TeamTeaTime\Forum\Models\Category;
 
 class SearchPosts extends FormRequest implements FulfillableRequest
 {
     use AuthorizesAfterValidation;
 
-    private ?Category $category = null;
+    private ?Model $category = null;
 
     public function rules(): array
     {
@@ -48,7 +49,7 @@ class SearchPosts extends FormRequest implements FulfillableRequest
         $categoryId = $this->query('category_id');
 
         if (! isset($this->category) && $categoryId != null && is_numeric($categoryId)) {
-            $this->category = Category::find($categoryId);
+            $this->category = CategoryFactory::model()::find($categoryId);
         }
 
         return $this->category;

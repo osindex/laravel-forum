@@ -2,17 +2,24 @@
 
 namespace TeamTeaTime\Forum\Actions;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use TeamTeaTime\Forum\Models\Category;
-use TeamTeaTime\Forum\Models\Post;
-use TeamTeaTime\Forum\Models\Thread;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
+use TeamTeaTime\Forum\Factories\PostFactory;
 
 class DeleteCategory extends BaseAction
 {
-    private Category $category;
+    private Model $category;
+    protected $categoryModel = null;
+    protected $threadModel = null;
+    protected $postModel = null;
 
-    public function __construct(Category $category)
+    public function __construct(Model $category)
     {
+        $this->categoryModel = CategoryFactory::model();
+        $this->threadModel = ThreadFactory::model();
+        $this->postModel = PostFactory::model();
         $this->category = $category;
     }
 
@@ -20,19 +27,19 @@ class DeleteCategory extends BaseAction
     {
         $categoryIdsToDelete = [];
         $threadIdsToDelete = [];
-        if (! $this->category->isEmpty()) {
+        if (!$this->category->isEmpty()) {
             $descendantIds = $this->category->descendants->pluck('id')->toArray();
             $categoryIdsToDelete = $descendantIds;
-            $threadIdsToDelete = Thread::whereIn('category_id', $descendantIds)->withTrashed()->pluck('id')->toArray();
+            $threadIdsToDelete = $this->threadModel::whereIn('category_id', $descendantIds)->withTrashed()->pluck('id')->toArray();
         }
 
         $categoryIdsToDelete[] = $this->category->id;
         $threadIdsToDelete = array_merge($threadIdsToDelete, $this->category->threads()->withTrashed()->pluck('id')->toArray());
 
-        Post::whereIn('thread_id', $threadIdsToDelete)->withTrashed()->forceDelete();
-        DB::table(Thread::READERS_TABLE)->whereIn('thread_id', $threadIdsToDelete)->delete();
-        Thread::whereIn('id', $threadIdsToDelete)->withTrashed()->forceDelete();
+        $this->postModel::whereIn('thread_id', $threadIdsToDelete)->withTrashed()->forceDelete();
+        DB::table($this->threadModel::READERS_TABLE)->whereIn('thread_id', $threadIdsToDelete)->delete();
+        $this->threadModel::whereIn('id', $threadIdsToDelete)->withTrashed()->forceDelete();
 
-        return Category::whereIn('id', $categoryIdsToDelete)->delete();
+        return $this->categoryModel::whereIn('id', $categoryIdsToDelete)->delete();
     }
 }

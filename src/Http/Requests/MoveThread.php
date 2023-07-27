@@ -2,18 +2,19 @@
 
 namespace TeamTeaTime\Forum\Http\Requests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use TeamTeaTime\Forum\Actions\MoveThread as Action;
 use TeamTeaTime\Forum\Events\UserMovedThread;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
 use TeamTeaTime\Forum\Http\Requests\Traits\AuthorizesAfterValidation;
 use TeamTeaTime\Forum\Interfaces\FulfillableRequest;
-use TeamTeaTime\Forum\Models\Category;
 
 class MoveThread extends FormRequest implements FulfillableRequest
 {
     use AuthorizesAfterValidation;
 
-    private Category $destinationCategory;
+    private Model $destinationCategory;
 
     public function rules(): array
     {
@@ -46,10 +47,10 @@ class MoveThread extends FormRequest implements FulfillableRequest
         return $thread;
     }
 
-    private function getDestinationCategory(): Category
+    private function getDestinationCategory(): Model
     {
         if (! isset($this->destinationCategory)) {
-            $this->destinationCategory = Category::find($this->input('category_id'));
+            $this->destinationCategory = CategoryFactory::model()::find($this->input('category_id'));
         }
 
         return $this->destinationCategory;

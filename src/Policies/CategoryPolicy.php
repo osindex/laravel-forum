@@ -2,16 +2,16 @@
 
 namespace TeamTeaTime\Forum\Policies;
 
-use TeamTeaTime\Forum\Models\Category;
+use Illuminate\Database\Eloquent\Model;
 
 class CategoryPolicy
 {
-    public function createThreads($user, Category $category): bool
+    public function createThreads($user, Model $category): bool
     {
         return true;
     }
 
-    public function manageThreads($user, Category $category): bool
+    public function manageThreads($user, Model $category): bool
     {
         return $this->deleteThreads($user, $category) ||
                $this->restoreThreads($user, $category) ||
@@ -20,52 +20,52 @@ class CategoryPolicy
                $this->pinThreads($user, $category);
     }
 
-    public function deleteThreads($user, Category $category): bool
+    public function deleteThreads($user, Model $category): bool
     {
         return true;
     }
 
-    public function restoreThreads($user, Category $category): bool
+    public function restoreThreads($user, Model $category): bool
     {
         return true;
     }
 
-    public function enableThreads($user, Category $category): bool
+    public function enableThreads($user, Model $category): bool
     {
         return false;
     }
 
-    public function moveThreadsFrom($user, Category $category): bool
+    public function moveThreadsFrom($user, Model $category): bool
     {
         return false;
     }
 
-    public function moveThreadsTo($user, Category $category): bool
+    public function moveThreadsTo($user, Model $category): bool
     {
         return false;
     }
 
-    public function lockThreads($user, Category $category): bool
+    public function lockThreads($user, Model $category): bool
     {
         return false;
     }
 
-    public function pinThreads($user, Category $category): bool
+    public function pinThreads($user, Model $category): bool
     {
         return false;
     }
 
-    public function markThreadsAsRead($user, Category $category): bool
+    public function markThreadsAsRead($user, Model $category): bool
     {
         return true;
     }
 
-    public function view($user, Category $category): bool
+    public function view($user, Model $category): bool
     {
         return true;
     }
 
-    public function delete($user, Category $category): bool
+    public function delete($user, Model $category): bool
     {
         return false;
     }

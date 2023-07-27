@@ -4,18 +4,24 @@ namespace TeamTeaTime\Forum\Actions;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use TeamTeaTime\Forum\Models\Post;
-use TeamTeaTime\Forum\Models\Thread;
+use TeamTeaTime\Forum\Factories\PostFactory;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
 
 class CreatePost extends BaseAction
 {
-    private Thread $thread;
-    private ?Post $parent;
+    protected $threadModel = null;
+    protected $postModel = null;
+
+    private Model $thread;
+    private ?Model $parent;
     private Model $author;
     private string $content;
 
-    public function __construct(Thread $thread, ?Post $parent, Model $author, string $content)
+    public function __construct(Model $thread, ?Model $parent, Model $author, string $content)
     {
+        $this->threadModel = ThreadFactory::model();
+        $this->postModel = PostFactory::model();
+
         $this->thread = $thread;
         $this->parent = $parent;
         $this->author = $author;

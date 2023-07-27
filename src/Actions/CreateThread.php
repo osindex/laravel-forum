@@ -4,19 +4,25 @@ namespace TeamTeaTime\Forum\Actions;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use TeamTeaTime\Forum\Models\Category;
-use TeamTeaTime\Forum\Models\Thread;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
 
 class CreateThread extends BaseAction
 {
-    private Category $category;
+    protected $categoryModel = null;
+    protected $threadModel = null;
+
+    private Model $category;
     private Model $author;
     private string $title;
     private string $content;
-    private Array $images;
+    private array $images;
 
-    public function __construct(Category $category, Model $author, string $title, string $content, Array $images)
+    public function __construct(Model $category, Model $author, string $title, string $content, array $images)
     {
+        $this->categoryModel = CategoryFactory::model();
+        $this->threadModel = ThreadFactory::model();
+
         $this->category = $category;
         $this->author = $author;
         $this->title = $title;
@@ -26,7 +32,7 @@ class CreateThread extends BaseAction
 
     protected function transact()
     {
-        $thread = Thread::create([
+        $thread = $this->threadModel::create([
             'author_id' => $this->author->getKey(),
             'category_id' => $this->category->id,
             'title' => $this->title,

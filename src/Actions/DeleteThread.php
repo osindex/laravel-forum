@@ -2,15 +2,15 @@
 
 namespace TeamTeaTime\Forum\Actions;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use TeamTeaTime\Forum\Models\Thread;
 
 class DeleteThread extends BaseAction
 {
-    private Thread $thread;
+    private Model $thread;
     private bool $permaDelete;
 
-    public function __construct(Thread $thread, bool $permaDelete = false)
+    public function __construct(Model $thread, bool $permaDelete = false)
     {
         $this->thread = $thread;
         $this->permaDelete = $permaDelete;

@@ -5,9 +5,9 @@ namespace TeamTeaTime\Forum\Http\Requests\Bulk;
 use Illuminate\Foundation\Http\FormRequest;
 use TeamTeaTime\Forum\Actions\Bulk\RestoreThreads as Action;
 use TeamTeaTime\Forum\Events\UserBulkRestoredThreads;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
 use TeamTeaTime\Forum\Http\Requests\Traits\AuthorizesAfterValidation;
 use TeamTeaTime\Forum\Interfaces\FulfillableRequest;
-use TeamTeaTime\Forum\Models\Thread;
 
 class RestoreThreads extends FormRequest implements FulfillableRequest
 {
@@ -26,7 +26,7 @@ class RestoreThreads extends FormRequest implements FulfillableRequest
             return false;
         }
 
-        $threads = Thread::whereIn('id', $this->validated()['threads'])->get();
+        $threads = ThreadFactory::model()::whereIn('id', $this->validated()['threads'])->get();
         foreach ($threads as $thread) {
             if (! ($this->user()->can('restoreThreads', $thread->category) && $this->user()->can('restore', $thread))) {
                 return false;

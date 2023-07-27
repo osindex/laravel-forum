@@ -12,12 +12,17 @@ use TeamTeaTime\Forum\Events\UserViewingIndex;
 use TeamTeaTime\Forum\Http\Requests\CreateCategory;
 use TeamTeaTime\Forum\Http\Requests\DeleteCategory;
 use TeamTeaTime\Forum\Http\Requests\UpdateCategory;
-use TeamTeaTime\Forum\Models\Category;
 use TeamTeaTime\Forum\Support\CategoryPrivacy;
 use TeamTeaTime\Forum\Support\Web\Forum;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
 
 class CategoryController extends BaseController
 {
+    protected $categoryModel = null;
+    public function __construct()
+    {
+        $this->categoryModel = CategoryFactory::model();
+    }
     public function index(Request $request): View
     {
         $categories = CategoryPrivacy::getFilteredTreeFor($request->user());
@@ -33,7 +38,7 @@ class CategoryController extends BaseController
     {
         $category = $request->route('category');
 
-        if (! $category->isAccessibleTo($request->user())) {
+        if (!$category->isAccessibleTo($request->user())) {
             abort(404);
         }
 
@@ -42,18 +47,18 @@ class CategoryController extends BaseController
         }
 
         $privateAncestor = $request->user() && $request->user()->can('manageCategories')
-            ? Category::defaultOrder()
-                ->where('is_private', true)
-                ->ancestorsOf($category->id)
-                ->first()
+            ? $this->categoryModel::defaultOrder()
+            ->where('is_private', true)
+            ->ancestorsOf($category->id)
+            ->first()
             : [];
 
         $categories = $request->user() && $request->user()->can('moveCategories')
-            ? Category::defaultOrder()
-                ->with('children')
-                ->where('accepts_threads', true)
-                ->withDepth()
-                ->get()
+            ? $this->categoryModel::defaultOrder()
+            ->with('children')
+            ->where('accepts_threads', true)
+            ->withDepth()
+            ->get()
             : [];
 
         $threads = $request->user() && $request->user()->can('viewTrashedThreads')
@@ -124,7 +129,7 @@ class CategoryController extends BaseController
 
     public function manage(Request $request): View
     {
-        $categories = Category::defaultOrder()->get();
+        $categories = $this->categoryModel::defaultOrder()->get();
         $categories->makeHidden(['_lft', '_rgt', 'thread_count', 'post_count']);
 
         return ViewFactory::make('forum.category.manage', ['categories' => $categories->toTree()]);

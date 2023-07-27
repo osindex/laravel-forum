@@ -10,6 +10,8 @@ use TeamTeaTime\Forum\Events\UserCreatingThread;
 use TeamTeaTime\Forum\Events\UserViewingRecent;
 use TeamTeaTime\Forum\Events\UserViewingThread;
 use TeamTeaTime\Forum\Events\UserViewingUnread;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
 use TeamTeaTime\Forum\Http\Requests\CreateThread;
 use TeamTeaTime\Forum\Http\Requests\DeleteThread;
 use TeamTeaTime\Forum\Http\Requests\LockThread;
@@ -20,8 +22,6 @@ use TeamTeaTime\Forum\Http\Requests\RenameThread;
 use TeamTeaTime\Forum\Http\Requests\RestoreThread;
 use TeamTeaTime\Forum\Http\Requests\UnlockThread;
 use TeamTeaTime\Forum\Http\Requests\UnpinThread;
-use TeamTeaTime\Forum\Models\Category;
-use TeamTeaTime\Forum\Models\Thread;
 use TeamTeaTime\Forum\Support\CategoryPrivacy;
 use TeamTeaTime\Forum\Support\Web\Forum;
 
@@ -29,7 +29,7 @@ class ThreadController extends BaseController
 {
     public function recent(Request $request): View
     {
-        $threads = Thread::recent()->with('category', 'author', 'lastPost', 'lastPost.author', 'lastPost.thread');
+        $threads = ThreadFactory::model()::recent()->with('category', 'author', 'lastPost', 'lastPost.author', 'lastPost.thread');
 
         if ($request->has('category_id')) {
             $threads = $threads->where('category_id', $request->input('category_id'));
@@ -50,7 +50,7 @@ class ThreadController extends BaseController
 
     public function unread(Request $request): View
     {
-        $threads = Thread::recent()->with('category', 'author', 'lastPost', 'lastPost.author', 'lastPost.thread');
+        $threads = ThreadFactory::model()::recent()->with('category', 'author', 'lastPost', 'lastPost.author', 'lastPost.thread');
 
         $accessibleCategoryIds = CategoryPrivacy::getFilteredFor($request->user())->keys();
 
@@ -100,7 +100,7 @@ class ThreadController extends BaseController
 
         $category = $thread->category;
         $categories = $request->user() && $request->user()->can('moveThreadsFrom', $category)
-                    ? Category::acceptsThreads()->get()->toTree()
+                    ? CategoryFactory::model()::acceptsThreads()->get()->toTree()
                     : [];
 
         $posts = config('forum.general.display_trashed_posts') || $request->user() && $request->user()->can('viewTrashedPosts')

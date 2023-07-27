@@ -2,16 +2,16 @@
 
 namespace TeamTeaTime\Forum\Events\Types;
 
-use TeamTeaTime\Forum\Models\Post;
+use Illuminate\Database\Eloquent\Model;
 
 class PostEvent extends BaseEvent
 {
     /** @var mixed */
     public $user;
 
-    public Post $post;
+    public Model $post;
 
-    public function __construct($user, Post $post)
+    public function __construct($user, Model $post)
     {
         $this->user = $user;
         $this->post = $post;

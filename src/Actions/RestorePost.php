@@ -2,21 +2,21 @@
 
 namespace TeamTeaTime\Forum\Actions;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use TeamTeaTime\Forum\Models\Post;
 
 class RestorePost extends BaseAction
 {
-    private Post $post;
+    private Model $post;
 
-    public function __construct(Post $post)
+    public function __construct(Model $post)
     {
         $this->post = $post;
     }
 
     protected function transact()
     {
-        if (! $this->post->trashed()) {
+        if (!$this->post->trashed()) {
             return null;
         }
 

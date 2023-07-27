@@ -13,7 +13,7 @@ abstract class BaseModel extends Model
         parent::__construct($attributes);
 
         if ($this->forceDeleting) {
-            $this->forceDeleting = ! config('forum.preferences.soft_deletes');
+            $this->forceDeleting = ! config('forum.general.soft_deletes');
         }
     }
 

@@ -2,16 +2,15 @@
 
 namespace TeamTeaTime\Forum\Actions;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use TeamTeaTime\Forum\Models\Category;
-use TeamTeaTime\Forum\Models\Thread;
 
 class MoveThread extends BaseAction
 {
-    private Thread $thread;
-    private Category $destinationCategory;
+    private Model $thread;
+    private Model $destinationCategory;
 
-    public function __construct(Thread $thread, Category $destinationCategory)
+    public function __construct(Model $thread, Model $destinationCategory)
     {
         $this->thread = $thread;
         $this->destinationCategory = $destinationCategory;

@@ -5,9 +5,9 @@ namespace TeamTeaTime\Forum\Http\Requests\Bulk;
 use Illuminate\Foundation\Http\FormRequest;
 use TeamTeaTime\Forum\Actions\Bulk\RestorePosts as Action;
 use TeamTeaTime\Forum\Events\UserBulkRestoredPosts;
+use TeamTeaTime\Forum\Factories\PostFactory;
 use TeamTeaTime\Forum\Http\Requests\Traits\AuthorizesAfterValidation;
 use TeamTeaTime\Forum\Interfaces\FulfillableRequest;
-use TeamTeaTime\Forum\Models\Post;
 
 class RestorePosts extends FormRequest implements FulfillableRequest
 {
@@ -22,7 +22,7 @@ class RestorePosts extends FormRequest implements FulfillableRequest
 
     public function authorizeValidated(): bool
     {
-        $posts = Post::whereIn('id', $this->validated()['posts'])->onlyTrashed()->get();
+        $posts = PostFactory::model()::whereIn('id', $this->validated()['posts'])->onlyTrashed()->get();
         foreach ($posts as $post) {
             if (! ($this->user()->can('restorePosts', $post->thread) && $this->user()->can('restore', $post))) {
                 return false;

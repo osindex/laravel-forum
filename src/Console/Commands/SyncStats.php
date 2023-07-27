@@ -4,9 +4,10 @@ namespace TeamTeaTime\Forum\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Builder;
-use TeamTeaTime\Forum\Models\Category;
-use TeamTeaTime\Forum\Models\Post;
-use TeamTeaTime\Forum\Models\Thread;
+
+use TeamTeaTime\Forum\Factories\CategoryFactory;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
+use TeamTeaTime\Forum\Factories\PostFactory;
 
 class SyncStats extends Command
 {
@@ -44,7 +45,7 @@ class SyncStats extends Command
     {
         $this->info('Processing categories...');
 
-        $query = Category::with('threads', 'threads.posts');
+        $query = CategoryFactory::model()::with('threads', 'threads.posts');
 
         if ($skip != null) {
             $query->skip($skip);
@@ -63,7 +64,7 @@ class SyncStats extends Command
             $newestThreadId = $category->getNewestThreadId();
             $latestActiveThreadId = $category->getLatestActiveThreadId();
 
-            $postCount = Post::whereHas('thread', function (Builder $query) use ($category) {
+            $postCount = PostFactory::model()::whereHas('thread', function (Builder $query) use ($category) {
                 $query->where('category_id', $category->id);
             })->count();
 
@@ -85,7 +86,7 @@ class SyncStats extends Command
     {
         $this->info('Processing threads...');
 
-        $query = Thread::with('posts');
+        $query = ThreadFactory::model()::with('posts');
 
         if ($skip != null) {
             $query->skip($skip);

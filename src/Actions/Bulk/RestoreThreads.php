@@ -4,20 +4,21 @@ namespace TeamTeaTime\Forum\Actions\Bulk;
 
 use Illuminate\Support\Facades\DB;
 use TeamTeaTime\Forum\Actions\BaseAction;
-use TeamTeaTime\Forum\Models\Thread;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
 
 class RestoreThreads extends BaseAction
 {
     private array $threadIds;
-
+    protected $threadModel = null;
     public function __construct(array $threadIds)
     {
+        $this->threadModel = ThreadFactory::model();
         $this->threadIds = $threadIds;
     }
 
     protected function transact()
     {
-        $threads = Thread::whereIn('id', $this->threadIds)->onlyTrashed()->get();
+        $threads = $this->threadModel::whereIn('id', $this->threadIds)->onlyTrashed()->get();
 
         // Return early if there are no eligible threads in the selection
         if ($threads->count() == 0) {
@@ -25,10 +26,10 @@ class RestoreThreads extends BaseAction
         }
 
         // Use the raw query builder to prevent touching updated_at
-        $rowsAffected = DB::table(Thread::getTableName())
+        $rowsAffected = DB::table($this->threadModel::getTableName())
             ->whereIn('id', $this->threadIds)
-            ->whereNotNull(Thread::DELETED_AT)
-            ->update([Thread::DELETED_AT => null]);
+            ->whereNotNull($this->threadModel::DELETED_AT)
+            ->update([$this->threadModel::DELETED_AT => null]);
 
         if ($rowsAffected == 0) {
             return null;

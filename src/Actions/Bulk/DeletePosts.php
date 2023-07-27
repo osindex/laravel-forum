@@ -4,16 +4,18 @@ namespace TeamTeaTime\Forum\Actions\Bulk;
 
 use Illuminate\Support\Facades\DB;
 use TeamTeaTime\Forum\Actions\BaseAction;
-use TeamTeaTime\Forum\Models\Post;
+use TeamTeaTime\Forum\Factories\PostFactory;
 
 class DeletePosts extends BaseAction
 {
     private array $postIds;
     private bool $includeTrashed;
     private bool $permaDelete;
-
+    protected $postModel = null;
+    
     public function __construct(array $postIds, bool $includeTrashed, bool $permaDelete = false)
     {
+        $this->postModel = PostFactory::model();
         $this->postIds = $postIds;
         $this->includeTrashed = $includeTrashed;
         $this->permaDelete = $permaDelete;
@@ -21,14 +23,14 @@ class DeletePosts extends BaseAction
 
     protected function transact()
     {
-        $query = Post::whereIn('id', $this->postIds);
+        $query = $this->postModel::whereIn('id', $this->postIds);
 
         if ($this->includeTrashed) {
             $posts = $query->withTrashed()->get();
 
             // Return early if this is a soft-delete and the selected posts are already trashed,
             // or there are no valid posts in the selection
-            if (! $this->permaDelete && $posts->whereNull(Post::DELETED_AT)->count() == 0) {
+            if (!$this->permaDelete && $posts->whereNull($this->postModel::DELETED_AT)->count() == 0) {
                 return null;
             }
         } else {
@@ -66,7 +68,7 @@ class DeletePosts extends BaseAction
                 }
 
                 if ($thread->posts()->count() == 0) {
-                    if (! $thread->trashed()) {
+                    if (!$thread->trashed()) {
                         // Thread has not been soft-deleted already;
                         // it should count towards threads removed for this category
                         $categoryThreadsRemoved++;

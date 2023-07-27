@@ -2,13 +2,13 @@
 
 namespace TeamTeaTime\Forum\Actions;
 
-use TeamTeaTime\Forum\Models\Thread;
+use Illuminate\Database\Eloquent\Model;
 
 class UnlockThread extends BaseAction
 {
-    private Thread $thread;
+    private Model $thread;
 
-    public function __construct(Thread $thread)
+    public function __construct(Model $thread)
     {
         $this->thread = $thread;
     }

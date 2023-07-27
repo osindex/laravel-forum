@@ -18,20 +18,21 @@ use TeamTeaTime\Forum\Http\Requests\RestoreThread;
 use TeamTeaTime\Forum\Http\Requests\UnlockThread;
 use TeamTeaTime\Forum\Http\Requests\UnpinThread;
 use TeamTeaTime\Forum\Http\Resources\ThreadResource;
-use TeamTeaTime\Forum\Models\Thread;
 
 class ThreadController extends BaseController
 {
     protected $resourceClass = null;
+    protected $model = null;
 
     public function __construct()
     {
         $this->resourceClass = config('forum.api.resources.thread', ThreadResource::class);
+        $this->model = config('forum.integration.models.thread');
     }
 
     public function recent(Request $request, bool $unreadOnly = false): AnonymousResourceCollection
     {
-        $threads = Thread::recent()
+        $threads = $this->model::recent()
             ->get()
             ->filter(function ($thread) use ($request, $unreadOnly) {
                 return $thread->category->isAccessibleTo($request->user())
@@ -65,7 +66,7 @@ class ThreadController extends BaseController
             return $this->notFoundResponse();
         }
 
-        $query = Thread::orderBy('created_at')->where('category_id', $category->id);
+        $query = $this->model::orderBy('created_at')->where('category_id', $category->id);
 
         $createdAfter = $request->query('created_after');
         $createdBefore = $request->query('created_before');

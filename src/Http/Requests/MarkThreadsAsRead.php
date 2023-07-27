@@ -2,18 +2,19 @@
 
 namespace TeamTeaTime\Forum\Http\Requests;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 use TeamTeaTime\Forum\Actions\MarkThreadsAsRead as Action;
 use TeamTeaTime\Forum\Events\UserMarkedThreadsAsRead;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
 use TeamTeaTime\Forum\Http\Requests\Traits\AuthorizesAfterValidation;
 use TeamTeaTime\Forum\Interfaces\FulfillableRequest;
-use TeamTeaTime\Forum\Models\Category;
 
 class MarkThreadsAsRead extends FormRequest implements FulfillableRequest
 {
     use AuthorizesAfterValidation;
 
-    private ?Category $category;
+    private ?Model $category;
 
     public function rules(): array
     {
@@ -48,7 +49,7 @@ class MarkThreadsAsRead extends FormRequest implements FulfillableRequest
     private function category()
     {
         if (! isset($this->category)) {
-            $this->category = isset($this->validated()['category_id']) ? Category::find($this->validated()['category_id']) : null;
+            $this->category = isset($this->validated()['category_id']) ? CategoryFactory::model()::find($this->validated()['category_id']) : null;
         }
 
         return $this->category;

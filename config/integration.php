@@ -21,6 +21,12 @@ return [
         ],
     ],
 
+    'models' => [
+        'category' => TeamTeaTime\Forum\Models\Category::class,
+        'thread' => TeamTeaTime\Forum\Models\Thread::class,
+        'post' => TeamTeaTime\Forum\Models\Post::class,
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Application user model

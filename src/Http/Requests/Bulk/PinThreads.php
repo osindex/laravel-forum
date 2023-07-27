@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Http\FormRequest;
 use TeamTeaTime\Forum\Actions\Bulk\PinThreads as Action;
 use TeamTeaTime\Forum\Events\UserBulkPinnedThreads;
+use TeamTeaTime\Forum\Factories\CategoryFactory;
+use TeamTeaTime\Forum\Factories\ThreadFactory;
 use TeamTeaTime\Forum\Http\Requests\Traits\AuthorizesAfterValidation;
 use TeamTeaTime\Forum\Interfaces\FulfillableRequest;
-use TeamTeaTime\Forum\Models\Category;
-use TeamTeaTime\Forum\Models\Thread;
 
 class PinThreads extends FormRequest implements FulfillableRequest
 {
@@ -48,7 +48,7 @@ class PinThreads extends FormRequest implements FulfillableRequest
 
     protected function categories(): Collection
     {
-        $query = Thread::whereIn('id', $this->validated()['threads']);
+        $query = ThreadFactory::model()::whereIn('id', $this->validated()['threads']);
 
         if ($this->user()->can('viewTrashedThreads')) {
             $query = $query->withTrashed();
@@ -56,6 +56,6 @@ class PinThreads extends FormRequest implements FulfillableRequest
 
         $categoryIds = $query->select('category_id')->distinct()->pluck('category_id');
 
-        return Category::whereIn('id', $categoryIds)->get();
+        return CategoryFactory::model()::whereIn('id', $categoryIds)->get();
     }
 }

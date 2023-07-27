@@ -2,6 +2,7 @@
 
 namespace TeamTeaTime\Forum\Http\Controllers\Api;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -12,21 +13,21 @@ use TeamTeaTime\Forum\Http\Requests\RestorePost;
 use TeamTeaTime\Forum\Http\Requests\SearchPosts;
 use TeamTeaTime\Forum\Http\Requests\UpdatePost;
 use TeamTeaTime\Forum\Http\Resources\PostResource;
-use TeamTeaTime\Forum\Models\Post;
 
 class PostController extends BaseController
 {
     protected $resourceClass = null;
-
+    protected $model = null;
     public function __construct()
     {
         $this->resourceClass = config('forum.api.resources.post', PostResource::class);
+        $this->model = config('forum.integration.models.post');
     }
 
     public function indexByThread(Request $request): AnonymousResourceCollection|Response
     {
         $thread = $request->route('thread');
-        if (! $thread->category->isAccessibleTo($request->user())) {
+        if (!$thread->category->isAccessibleTo($request->user())) {
             return $this->notFoundResponse();
         }
 
@@ -46,13 +47,12 @@ class PostController extends BaseController
 
     public function recent(Request $request, bool $unreadOnly = false): AnonymousResourceCollection
     {
-        $posts = Post::recent()
+        $posts = $this->model::recent()
             ->get()
-            ->filter(function (Post $post) use ($request, $unreadOnly) {
+            ->filter(function (Model $post) use ($request, $unreadOnly) {
                 return $post->thread->category->isAccessibleTo($request->user())
-                    && (! $unreadOnly || $post->thread->reader === null || $post->updatedSince($post->thread->reader))
-                    && (
-                        ! $post->thread->category->is_private
+                    && (!$unreadOnly || $post->thread->reader === null || $post->updatedSince($post->thread->reader))
+                    && (!$post->thread->category->is_private
                         || $request->user()
                         && $request->user()->can('view', $post->thread)
                     );
@@ -69,7 +69,7 @@ class PostController extends BaseController
     public function fetch(Request $request): JsonResource|Response
     {
         $post = $request->route('post');
-        if (! $post->thread->category->isAccessibleTo($request->user())) {
+        if (!$post->thread->category->isAccessibleTo($request->user())) {
             return $this->notFoundResponse();
         }
 

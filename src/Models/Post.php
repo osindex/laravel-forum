@@ -43,13 +43,16 @@ class Post extends BaseModel
     {
         return $this->hasMany(Post::class, 'post_id')->withTrashed();
     }
-
+    public function scopeShow(Builder $query): Builder
+    {
+        return $query->where('status', Thread::STATUS_SHOW);
+    }
     public function scopeRecent(Builder $query): Builder
     {
         $age = strtotime(config('forum.general.old_thread_threshold'), 0);
         $cutoff = time() - $age;
 
-        return $query->where('updated_at', '>', date('Y-m-d H:i:s', $cutoff))->orderBy('updated_at', 'desc');
+        return $query->where('updated_at', '>', date('Y-m-d H:i:s', $cutoff))->orderBy('updated_at', 'desc')->show();
     }
 
     public function getSequenceNumber(): int
