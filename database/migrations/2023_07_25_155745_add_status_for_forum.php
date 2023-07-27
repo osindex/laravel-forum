@@ -17,10 +17,10 @@ class AddStatusForForum extends Migration
             $table->unsignedTinyInteger('status')->nullable()->default(0)->comment('0 check 1pass 2hide')->after('is_private');
         });
         Schema::table('forum_threads', function (Blueprint $table) {
-            $table->string('status', 10)->default('show')->comment('stash,show')->after('locked');
+            $table->unsignedTinyInteger('status')->default(1)->comment('0stash,1show')->after('locked');
         });
         Schema::table('forum_posts', function (Blueprint $table) {
-            $table->string('status', 10)->default('show')->comment('stash,show')->after('sequence');
+            $table->unsignedTinyInteger('status')->default(1)->comment('0stash,1show')->after('sequence');
         });
     }
 

@@ -66,8 +66,9 @@ class ThreadController extends BaseController
             return $this->notFoundResponse();
         }
 
-        $query = $this->model::where('category_id', $category->id)->sortBy($request->get('sort', '-id'))->status($request->get('status', '-1'));
-
+        $query = $this->model::where('category_id', $category->id)
+            ->sortBy($request->get('sort', '-id'))
+            ->status($request->get('status', '-1'));
         $createdAfter = $request->query('created_after');
         $createdBefore = $request->query('created_before');
         $updatedAfter = $request->query('updated_after');

@@ -56,10 +56,18 @@ class CategoryPrivacy
     private static function getQuery(array $select = self::DEFAULT_SELECT, array $with = self::DEFAULT_WITH)
     {
         // 'is_private' and 'parent_id' fields are required for filtering
+        $request = request();
+        $getQuery = false;
+        if ($request->route()->getName() === 'api.forum.category.index') {
+            $getQuery = true;
+        }
         return CategoryFactory::model()::select(array_merge($select, ['is_private', 'parent_id']))
             ->with($with)
-            ->sortBy(request()->get('sort', '-id'))
-            ->status(request()->get('status', '-1'))
+            ->when($getQuery, function ($q) use ($request) {
+                return $q
+                    ->sortBy($request->get('sort', '-id'))
+                    ->status($request->get('status', '-1'));
+            })
             ->defaultOrder();
     }
 
@@ -67,7 +75,7 @@ class CategoryPrivacy
     {
         if ($rejected == null) {
             $rejected = $categories->reject(function ($category, $id) use ($user) {
-                return ! $category->is_private || (! is_null($user) && $user->can('view', $category));
+                return !$category->is_private || (!is_null($user) && $user->can('view', $category));
             });
         }
 
