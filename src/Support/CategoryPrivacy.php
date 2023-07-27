@@ -56,9 +56,10 @@ class CategoryPrivacy
     private static function getQuery(array $select = self::DEFAULT_SELECT, array $with = self::DEFAULT_WITH)
     {
         // 'is_private' and 'parent_id' fields are required for filtering
-        
         return CategoryFactory::model()::select(array_merge($select, ['is_private', 'parent_id']))
             ->with($with)
+            ->sortBy(request()->get('sort', '-id'))
+            ->status(request()->get('status', '-1'))
             ->defaultOrder();
     }
 

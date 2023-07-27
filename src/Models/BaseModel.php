@@ -2,6 +2,7 @@
 
 namespace TeamTeaTime\Forum\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseModel extends Model
@@ -68,5 +69,24 @@ abstract class BaseModel extends Model
         $this->timestamps = false;
         $this->{$method}();
         $this->timestamps = true;
+    }
+
+    public function scopeSortBy(Builder $query, $params = 'created_at'): Builder
+    {
+        $sortArray = explode(',', $params);
+        foreach ($sortArray as $param) {
+            $desc = strpos($param, '-') === false ? 'asc' : 'desc';
+            $sort = trim($param, '-');
+            $query = $query->orderBy($sort, $desc);
+        }
+        return $query;
+    }
+    
+    public function scopeStatus(Builder $query, $status): Builder
+    {
+        if ($status < 0) {
+            return $query;
+        }
+        return $query->where('status', $status);
     }
 }

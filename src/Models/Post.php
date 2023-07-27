@@ -44,25 +44,6 @@ class Post extends BaseModel
         return $this->hasMany(Post::class, 'post_id')->withTrashed();
     }
 
-    public function scopeSortBy(Builder $query, $params = 'created_at'): Builder
-    {
-        $sortArray = explode(',', $params);
-        foreach ($sortArray as $param) {
-            $desc = strpos($param, '-') === false ? 'asc' : 'desc';
-            $sort = trim($param, '-');
-            $query = $query->orderBy($sort, $desc);
-        }
-        return $query;
-    }
-
-    public function scopeStatus(Builder $query, $status): Builder
-    {
-        if ($status < 0) {
-            return $query;
-        }
-        return $query->where('status', $status);
-    }
-
     public function scopeShow(Builder $query): Builder
     {
         return $query->where('status', Thread::STATUS_SHOW);

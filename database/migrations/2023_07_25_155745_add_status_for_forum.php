@@ -13,6 +13,9 @@ class AddStatusForForum extends Migration
      */
     public function up()
     {
+        Schema::table('forum_categories', function (Blueprint $table) {
+            $table->unsignedTinyInteger('status')->nullable()->default(0)->comment('0 check 1pass 2hide')->after('is_private');
+        });
         Schema::table('forum_threads', function (Blueprint $table) {
             $table->string('status', 10)->default('show')->comment('stash,show')->after('locked');
         });
@@ -28,6 +31,9 @@ class AddStatusForForum extends Migration
      */
     public function down()
     {
+        Schema::table('forum_categories', function (Blueprint $table) {
+            $table->dropColumn(['status']);
+        });
         Schema::table('forum_threads', function (Blueprint $table) {
             $table->dropColumn(['status']);
         });
