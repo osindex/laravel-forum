@@ -67,7 +67,7 @@ class Thread extends BaseModel
 
     public function posts(): HasMany
     {
-        return $this->hasMany(Post::class, 'id', 'thread_id');
+        return $this->hasMany(Post::class, 'thread_id');
     }
 
     public function firstPost(): HasOne
