@@ -31,7 +31,7 @@ class Category extends BaseModel
 
     public function threads(): HasMany
     {
-        return $this->hasMany(ThreadFactory::model());
+        return $this->hasMany(ThreadFactory::model(), 'category_id');
     }
 
     public function newestThread(): HasOne
